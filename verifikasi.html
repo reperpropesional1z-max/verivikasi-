@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verifikasi Wajah 😂</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  color: white;
+  background: linear-gradient(135deg,#090979,#00d4ff);
+}
+
+.kartu {
+  width: 90%;
+  max-width: 380px;
+  padding: 25px;
+  border-radius: 25px;
+  text-align: center;
+  background: rgba(0,0,0,0.75);
+  box-shadow: 0 0 30px #00eaff;
+}
+
+h1 {
+  font-size: 25px;
+}
+
+.kamera {
+  width: 220px;
+  height: 220px;
+  margin: 20px auto;
+  border: 4px solid #00ffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  background: #111;
+}
+
+#video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+#monyet {
+  display: none;
+  font-size: 120px;
+  animation: muncul 0.7s ease;
+}
+
+.garis {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: #00ffff;
+  box-shadow: 0 0 15px #00ffff;
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+@keyframes muncul {
+  from {
+    transform: scale(0) rotate(-180deg);
+  }
+  to {
+    transform: scale(1) rotate(0);
+  }
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 12px;
+  background: #00eaff;
+  color: #001020;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: white;
+}
+
+#status {
+  min-height: 24px;
+  color: #00ffff;
+}
+
+#ulang {
+  display: none;
+  background: #ffcc00;
+}
+</style>
+</head>
+
+<body>
+<div class="kartu">
+  <h1>🔐 VERIFIKASI WAJAH</h1>
+  <p>Silakan lakukan verifikasi wajah Anda</p>
+
+  <div class="kamera">
+    <video id="video" autoplay playsinline></video>
+    <div id="ikon" style="font-size:90px">👤</div>
+    <div class="garis" id="garis"></div>
+    <div id="monyet">🐵</div>
+  </div>
+
+  <p id="status">Sistem siap melakukan verifikasi</p>
+
+  <button id="mulai" onclick="verifikasi()">
+    MULAI VERIFIKASI
+  </button>
+
+  <button id="ulang" onclick="resetDemo()">
+    COBA LAGI
+  </button>
+</div>
+
+<script>
+let stream = null;
+let timer = null;
+
+async function verifikasi() {
+  const status = document.getElementById("status");
+  const tombol = document.getElementById("mulai");
+  const garis = document.getElementById("garis");
+  const ikon = document.getElementById("ikon");
+  const monyet = document.getElementById("monyet");
+  const video = document.getElementById("video");
+
+  tombol.disabled = true;
+  tombol.textContent = "MEMINDAI...";
+  ikon.textContent = "🔍";
+  garis.style.display = "block";
+  status.textContent = "Memindai wajah...";
+
+  // Kamera bersifat opsional.
+  // Jika diizinkan, tampilkan pratinjau kamera.
+  try {
+    stream = await navigator.mediaDevices
+      .getUserMedia({ video: { facingMode: "user" } });
+
+    video.srcObject = stream;
+    video.style.display = "block";
+    ikon.style.display = "none";
+  } catch (error) {
+    status.textContent =
+      "Pemindaian simulasi sedang berjalan...";
+  }
+
+  timer = setTimeout(() => {
+    garis.style.display = "none";
+    video.style.display = "none";
+    ikon.style.display = "none";
+    monyet.style.display = "block";
+
+    status.textContent =
+      "✅ VERIFIKASI BERHASIL! Eh, kok monyet?! 😂";
+
+    tombol.style.display = "none";
+    document.getElementById("ulang").style.display = "block";
+
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      stream = null;
+    }
+  }, 3000);
+}
+
+function resetDemo() {
+  document.getElementById("monyet").style.display = "none";
+  document.getElementById("ikon").style.display = "block";
+  document.getElementById("ikon").textContent = "👤";
+  document.getElementById("video").style.display = "none";
+  document.getElementById("garis").style.display = "block";
+  document.getElementById("status").textContent =
+    "Sistem siap melakukan verifikasi";
+
+  document.getElementById("mulai").style.display = "block";
+  document.getElementById("mulai").disabled = false;
+  document.getElementById("mulai").textContent =
+    "MULAI VERIFIKASI";
+
+  document.getElementById("ulang").style.display = "none";
+  document.getElementById("garis").style.display = "none";
+}
+</script>
+</body>
+</html>
